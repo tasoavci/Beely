@@ -17,6 +17,7 @@ import {
     X,
     ChevronDown,
     Search,
+    Shield,
     Zap,
     Heart,
     Laugh,
@@ -536,7 +537,19 @@ function SidebarContent({
             </nav>
 
             {/* Bottom section */}
-            <div className="p-4 border-t border-zinc-800">
+            <div className="p-4 border-t border-zinc-800 space-y-2">
+                {/* Admin Panel Button */}
+                {(user as any).role === "admin" && (
+                    <Link
+                        href={route("admin.index")}
+                        className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 text-zinc-400 hover:text-white hover:bg-zinc-800 mb-2"
+                        onClick={onClose}
+                    >
+                        <Shield className="h-5 w-5" />
+                        Admin Panel
+                    </Link>
+                )}
+
                 {/* User info */}
                 <div className="flex items-center gap-3 p-2">
                     <div className="h-10 w-10 rounded-xl bg-gradient-to-br from-beely-400 to-beely-600 flex items-center justify-center text-white font-bold">

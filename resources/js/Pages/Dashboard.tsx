@@ -37,7 +37,7 @@ export default function Dashboard() {
                         </motion.div>
 
                         <h1 className="text-3xl sm:text-4xl font-bold mb-3">
-                            Hoş geldin, {user.name.split(" ")[0]}! 👋
+                            Hoş geldin, {user.name.split(" ")[0]}!
                         </h1>
                         <p className="text-beely-100 text-base sm:text-lg max-w-md mx-auto mb-8">
                             Bugün nasıl hissediyorsun? Beely ile sohbet ederek

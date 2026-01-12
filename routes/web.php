@@ -5,8 +5,13 @@ use App\Http\Controllers\ChatController;
 use App\Http\Controllers\FeedController;
 use App\Http\Controllers\LikedVideosController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\Admin\AdminController;
+use App\Http\Controllers\Admin\AdminUserController;
+use App\Http\Controllers\Admin\AdminVideoController;
+use App\Http\Controllers\Admin\AdminCategoryController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Mail;
 use Inertia\Inertia;
 
 Route::get('/', function () {
@@ -20,7 +25,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     Route::get('/feed/{category?}', [FeedController::class, 'index'])->name('feed');
 
-    // Video like routes
+    // video like routes
     Route::post('/video/{video}/like', [FeedController::class, 'toggleLike'])->name('video.like');
     Route::get('/liked-videos', [LikedVideosController::class, 'index'])->name('liked-videos');
 
@@ -38,17 +43,21 @@ Route::middleware('auth')->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
 
-Route::get('/mail-test', function () {
-    try {
-        Mail::raw('Bu bir test mailidir. Railway üzerinden gönderildi.', function ($message) {
-            $message->to('tasoavci2002@gmail.com') 
-                    ->subject('Railway Mail Testi');
-        });
-        
-        return 'BAŞARILI! ✅ Mail gönderildi, gelen kutunu kontrol et.';
-    } catch (\Exception $e) {
-        return 'HATA OLUŞTU ❌: ' . $e->getMessage();
-    }
+// admin routes
+Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(function () {
+    Route::get('/', [AdminController::class, 'index'])->name('index');
+    
+    Route::get('/users', [AdminUserController::class, 'index'])->name('users.index');
+    Route::delete('/users/{user}', [AdminUserController::class, 'destroy'])->name('users.destroy');
+    Route::post('/users/{user}/verify-email', [AdminUserController::class, 'verifyEmail'])->name('users.verify-email');
+    
+    Route::get('/videos', [AdminVideoController::class, 'index'])->name('videos.index');
+    Route::post('/videos', [AdminVideoController::class, 'store'])->name('videos.store');
+    Route::delete('/videos/{video}', [AdminVideoController::class, 'destroy'])->name('videos.destroy');
+
+    Route::get('/categories', [AdminCategoryController::class, 'index'])->name('categories.index');
+    Route::post('/categories', [AdminCategoryController::class, 'store'])->name('categories.store');
+    Route::delete('/categories/{category}', [AdminCategoryController::class, 'destroy'])->name('categories.destroy');
 });
 
 require __DIR__.'/auth.php';

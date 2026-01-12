@@ -37,6 +37,7 @@ class User extends Authenticatable implements MustVerifyEmail
         'name',
         'email',
         'password',
+        'role',
     ];
 
     /**
@@ -81,5 +82,15 @@ class User extends Authenticatable implements MustVerifyEmail
     public function sendPasswordResetNotification($token)
     {
         $this->notify(new ResetPasswordNotification($token));
+    }
+
+    /**
+     * Check if user is admin.
+     *
+     * @return bool
+     */
+    public function isAdmin(): bool
+    {
+        return $this->role === 'admin';
     }
 }
