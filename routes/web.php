@@ -41,7 +41,7 @@ Route::middleware('auth')->group(function () {
 Route::get('/mail-test', function () {
     try {
         Mail::raw('Bu bir test mailidir. Railway üzerinden gönderildi.', function ($message) {
-            $message->to('tasoavci@gmail.com') 
+            $message->to('tasoavci2002@gmail.com') 
                     ->subject('Railway Mail Testi');
         });
         
