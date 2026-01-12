@@ -1,0 +1,20 @@
+{
+    "name": "Beely",
+    "short_name": "Beely",
+    "description": "Ruh haline göre kişiselleştirilmiş video içerikler",
+    "start_url": "/",
+    "display": "standalone",
+    "background_color": "#09090B",
+    "theme_color": "#F59E0B",
+    "orientation": "portrait",
+    "icons": [
+        {
+            "src": "/favicon.svg",
+            "sizes": "any",
+            "type": "image/svg+xml"
+        }
+    ],
+    "categories": ["entertainment", "lifestyle"],
+    "lang": "tr"
+}
+
