@@ -16,7 +16,6 @@ import {
     Menu,
     X,
     ChevronDown,
-    Bell,
     Search,
     Zap,
     Heart,
@@ -387,12 +386,6 @@ export default function Authenticated({
 
                         {/* Right side items */}
                         <div className="flex items-center gap-3">
-                            {/* Notifications */}
-                            <button className="relative p-2 text-zinc-500 hover:text-zinc-700 dark:text-zinc-400 dark:hover:text-zinc-200 transition-colors">
-                                <Bell className="h-5 w-5" />
-                                <span className="absolute top-1.5 right-1.5 h-2 w-2 rounded-full bg-beely-500"></span>
-                            </button>
-
                             {/* User menu */}
                             <div className="relative">
                                 <button
