@@ -38,4 +38,17 @@ Route::middleware('auth')->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
 
+Route::get('/mail-test', function () {
+    try {
+        Mail::raw('Bu bir test mailidir. Railway üzerinden gönderildi.', function ($message) {
+            $message->to('tasoavci@gmail.com') 
+                    ->subject('Railway Mail Testi');
+        });
+        
+        return 'BAŞARILI! ✅ Mail gönderildi, gelen kutunu kontrol et.';
+    } catch (\Exception $e) {
+        return 'HATA OLUŞTU ❌: ' . $e->getMessage();
+    }
+});
+
 require __DIR__.'/auth.php';
