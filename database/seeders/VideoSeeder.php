@@ -8,17 +8,11 @@ use Illuminate\Database\Seeder;
 
 class VideoSeeder extends Seeder
 {
-    /**
-     * S3'teki videoları seed eder.
-     * 
-     * URL formatı: https://beely.s3.eu-north-1.amazonaws.com/{category_slug}/{category_slug}_{1-10}.mp4
-     */
     public function run(): void
     {
         $s3BaseUrl = 'https://beely.s3.eu-north-1.amazonaws.com';
         $videosPerCategory = 10;
 
-        // Tüm kategorileri al
         $categories = Category::all();
 
         if ($categories->isEmpty()) {
