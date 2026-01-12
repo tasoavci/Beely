@@ -37,5 +37,12 @@ Route::middleware('auth')->group(function () {
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
+Route::get('/veritabani-kur', function () {
+    Artisan::call('migrate:fresh', ['--force' => true]);
+
+    Artisan::call('db:seed', ['--force' => true]);
+    
+    return 'İşlem Başarılı! Veritabanı sıfırlandı ve dolduruldu.';
+});
 
 require __DIR__.'/auth.php';
