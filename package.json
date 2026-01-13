@@ -28,6 +28,7 @@
         "vite": "^7.0.7"
     },
     "dependencies": {
+        "@radix-ui/react-alert-dialog": "^1.1.15",
         "framer-motion": "^12.25.0",
         "lucide-react": "^0.562.0"
     }

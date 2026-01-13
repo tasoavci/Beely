@@ -1,7 +1,17 @@
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
 import { Head, Link, router, useForm } from "@inertiajs/react";
-import { Grid3X3, Trash2, Plus, ChevronLeft, Search, X } from "lucide-react";
+import { Grid3X3, Trash2, Plus, ChevronLeft, Search, X, AlertTriangle } from "lucide-react";
 import { useState, useRef } from "react";
+import {
+    AlertDialog,
+    AlertDialogAction,
+    AlertDialogCancel,
+    AlertDialogContent,
+    AlertDialogDescription,
+    AlertDialogFooter,
+    AlertDialogHeader,
+    AlertDialogTitle,
+} from "@/Components/ui/alert-dialog";
 
 interface Category {
     id: string;
@@ -45,6 +55,8 @@ const iconOptions = [
 export default function AdminCategories({ categories = { data: [] }, filters = {} }: Props) {
     const [showAddModal, setShowAddModal] = useState(false);
     const [deletingId, setDeletingId] = useState<string | null>(null);
+    const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+    const [categoryToDelete, setCategoryToDelete] = useState<string | null>(null);
     const [search, setSearch] = useState(filters?.search || "");
     const searchTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
@@ -89,11 +101,20 @@ export default function AdminCategories({ categories = { data: [] }, filters = {
         });
     };
 
-    const handleDelete = (categoryId: string) => {
-        if (confirm("Bu kategoriyi silmek istediğinize emin misiniz?")) {
-            setDeletingId(categoryId);
-            router.delete(route("admin.categories.destroy", categoryId), {
-                onFinish: () => setDeletingId(null),
+    const handleDeleteClick = (categoryId: string) => {
+        setCategoryToDelete(categoryId);
+        setShowDeleteDialog(true);
+    };
+
+    const handleDeleteConfirm = () => {
+        if (categoryToDelete) {
+            setDeletingId(categoryToDelete);
+            router.delete(route("admin.categories.destroy", categoryToDelete), {
+                onFinish: () => {
+                    setDeletingId(null);
+                    setShowDeleteDialog(false);
+                    setCategoryToDelete(null);
+                },
             });
         }
     };
@@ -190,7 +211,7 @@ export default function AdminCategories({ categories = { data: [] }, filters = {
                                     </div>
                                 </div>
                                 <button
-                                    onClick={() => handleDelete(category.id)}
+                                    onClick={() => handleDeleteClick(category.id)}
                                     disabled={deletingId === category.id}
                                     className="p-2 text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors disabled:opacity-50"
                                     title="Sil"
@@ -328,6 +349,29 @@ export default function AdminCategories({ categories = { data: [] }, filters = {
                     </div>
                 )}
             </div>
+
+            {/* Delete Confirmation Dialog */}
+            <AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
+                <AlertDialogContent>
+                    <AlertDialogHeader>
+                        <div className="flex items-center gap-3 mb-2">
+                            <div className="p-2 bg-red-100 dark:bg-red-900/30 rounded-lg">
+                                <AlertTriangle className="h-5 w-5 text-red-600 dark:text-red-400" />
+                            </div>
+                            <AlertDialogTitle>Kategoriyi Sil</AlertDialogTitle>
+                        </div>
+                        <AlertDialogDescription>
+                            Bu kategoriyi silmek istediğinize emin misiniz? Bu işlem geri alınamaz ve kategori kalıcı olarak silinecektir. Kategoriye ait videolar silinmeyecektir.
+                        </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                        <AlertDialogCancel>İptal</AlertDialogCancel>
+                        <AlertDialogAction onClick={handleDeleteConfirm}>
+                            Sil
+                        </AlertDialogAction>
+                    </AlertDialogFooter>
+                </AlertDialogContent>
+            </AlertDialog>
         </AuthenticatedLayout>
     );
 }

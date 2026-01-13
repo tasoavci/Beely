@@ -1,7 +1,25 @@
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
 import { Head, Link, router, useForm } from "@inertiajs/react";
-import { Video, Trash2, Plus, ChevronLeft, Search, X } from "lucide-react";
+import {
+    Video,
+    Trash2,
+    Plus,
+    ChevronLeft,
+    Search,
+    X,
+    AlertTriangle,
+} from "lucide-react";
 import { useState, useCallback, useRef } from "react";
+import {
+    AlertDialog,
+    AlertDialogAction,
+    AlertDialogCancel,
+    AlertDialogContent,
+    AlertDialogDescription,
+    AlertDialogFooter,
+    AlertDialogHeader,
+    AlertDialogTitle,
+} from "@/Components/ui/alert-dialog";
 
 interface VideoItem {
     id: string;
@@ -43,6 +61,8 @@ export default function AdminVideos({
 }: Props) {
     const [showAddModal, setShowAddModal] = useState(false);
     const [deletingId, setDeletingId] = useState<string | null>(null);
+    const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+    const [videoToDelete, setVideoToDelete] = useState<string | null>(null);
     const [search, setSearch] = useState(filters?.search || "");
     const searchTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
@@ -90,11 +110,20 @@ export default function AdminVideos({
         });
     };
 
-    const handleDelete = (videoId: string) => {
-        if (confirm("Bu videoyu silmek istediğinize emin misiniz?")) {
-            setDeletingId(videoId);
-            router.delete(route("admin.videos.destroy", videoId), {
-                onFinish: () => setDeletingId(null),
+    const handleDeleteClick = (videoId: string) => {
+        setVideoToDelete(videoId);
+        setShowDeleteDialog(true);
+    };
+
+    const handleDeleteConfirm = () => {
+        if (videoToDelete) {
+            setDeletingId(videoToDelete);
+            router.delete(route("admin.videos.destroy", videoToDelete), {
+                onFinish: () => {
+                    setDeletingId(null);
+                    setShowDeleteDialog(false);
+                    setVideoToDelete(null);
+                },
             });
         }
     };
@@ -211,7 +240,7 @@ export default function AdminVideos({
                                         <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                                             <button
                                                 onClick={() =>
-                                                    handleDelete(video.id)
+                                                    handleDeleteClick(video.id)
                                                 }
                                                 disabled={
                                                     deletingId === video.id
@@ -344,6 +373,34 @@ export default function AdminVideos({
                     </div>
                 )}
             </div>
+
+            {/* Delete Confirmation Dialog */}
+            <AlertDialog
+                open={showDeleteDialog}
+                onOpenChange={setShowDeleteDialog}
+            >
+                <AlertDialogContent>
+                    <AlertDialogHeader>
+                        <div className="flex items-center gap-3 mb-2">
+                            <div className="p-2 bg-red-100 dark:bg-red-900/30 rounded-lg">
+                                <AlertTriangle className="h-5 w-5 text-red-600 dark:text-red-400" />
+                            </div>
+                            <AlertDialogTitle>Videoyu Sil</AlertDialogTitle>
+                        </div>
+                        <AlertDialogDescription>
+                            Bu videoyu silmek istediğinize emin misiniz? Bu
+                            işlem geri alınamaz ve video kalıcı olarak
+                            silinecektir.
+                        </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                        <AlertDialogCancel>İptal</AlertDialogCancel>
+                        <AlertDialogAction onClick={handleDeleteConfirm}>
+                            Sil
+                        </AlertDialogAction>
+                    </AlertDialogFooter>
+                </AlertDialogContent>
+            </AlertDialog>
         </AuthenticatedLayout>
     );
 }

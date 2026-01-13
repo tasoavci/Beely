@@ -1,7 +1,17 @@
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
 import { Head, Link, router } from "@inertiajs/react";
-import { Users, Trash2, CheckCircle, XCircle, ChevronLeft, Search, X } from "lucide-react";
+import { Users, Trash2, CheckCircle, XCircle, ChevronLeft, Search, X, AlertTriangle } from "lucide-react";
 import { useState, useRef } from "react";
+import {
+    AlertDialog,
+    AlertDialogAction,
+    AlertDialogCancel,
+    AlertDialogContent,
+    AlertDialogDescription,
+    AlertDialogFooter,
+    AlertDialogHeader,
+    AlertDialogTitle,
+} from "@/Components/ui/alert-dialog";
 
 interface User {
     id: string;
@@ -29,6 +39,8 @@ interface Props {
 
 export default function AdminUsers({ users = { data: [] }, filters = {} }: Props) {
     const [deletingId, setDeletingId] = useState<string | null>(null);
+    const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+    const [userToDelete, setUserToDelete] = useState<string | null>(null);
     const [search, setSearch] = useState(filters?.search || "");
     const searchTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
@@ -57,11 +69,20 @@ export default function AdminUsers({ users = { data: [] }, filters = {} }: Props
         router.get(route("admin.users.index"), {}, { preserveState: true, replace: true });
     };
 
-    const handleDelete = (userId: string) => {
-        if (confirm("Bu kullanıcıyı silmek istediğinize emin misiniz?")) {
-            setDeletingId(userId);
-            router.delete(route("admin.users.destroy", userId), {
-                onFinish: () => setDeletingId(null),
+    const handleDeleteClick = (userId: string) => {
+        setUserToDelete(userId);
+        setShowDeleteDialog(true);
+    };
+
+    const handleDeleteConfirm = () => {
+        if (userToDelete) {
+            setDeletingId(userToDelete);
+            router.delete(route("admin.users.destroy", userToDelete), {
+                onFinish: () => {
+                    setDeletingId(null);
+                    setShowDeleteDialog(false);
+                    setUserToDelete(null);
+                },
             });
         }
     };
@@ -212,7 +233,7 @@ export default function AdminUsers({ users = { data: [] }, filters = {} }: Props
                                                     </button>
                                                 )}
                                                 <button
-                                                    onClick={() => handleDelete(user.id)}
+                                                    onClick={() => handleDeleteClick(user.id)}
                                                     disabled={deletingId === user.id}
                                                     className="p-2 text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors disabled:opacity-50"
                                                     title="Sil"
@@ -251,6 +272,29 @@ export default function AdminUsers({ users = { data: [] }, filters = {} }: Props
                     )}
                 </div>
             </div>
+
+            {/* Delete Confirmation Dialog */}
+            <AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
+                <AlertDialogContent>
+                    <AlertDialogHeader>
+                        <div className="flex items-center gap-3 mb-2">
+                            <div className="p-2 bg-red-100 dark:bg-red-900/30 rounded-lg">
+                                <AlertTriangle className="h-5 w-5 text-red-600 dark:text-red-400" />
+                            </div>
+                            <AlertDialogTitle>Kullanıcıyı Sil</AlertDialogTitle>
+                        </div>
+                        <AlertDialogDescription>
+                            Bu kullanıcıyı silmek istediğinize emin misiniz? Bu işlem geri alınamaz ve kullanıcının tüm verileri kalıcı olarak silinecektir.
+                        </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                        <AlertDialogCancel>İptal</AlertDialogCancel>
+                        <AlertDialogAction onClick={handleDeleteConfirm}>
+                            Sil
+                        </AlertDialogAction>
+                    </AlertDialogFooter>
+                </AlertDialogContent>
+            </AlertDialog>
         </AuthenticatedLayout>
     );
 }
